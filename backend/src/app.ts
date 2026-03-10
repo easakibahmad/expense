@@ -3,6 +3,7 @@ import cors from 'cors'
 import swaggerUi from 'swagger-ui-express'
 import expensesRouter from './routes/expenses.js'
 import categoriesRouter from './routes/categories.js'
+import planRouter from './routes/plan.js'
 import { errorHandler } from './middleware/errorHandler.js'
 import openapi from './docs/openapi.js'
 
@@ -23,6 +24,7 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(openapi))
 
 app.use('/api/expenses', expensesRouter)
 app.use('/api/categories', categoriesRouter)
+app.use('/api/plan', planRouter)
 
 app.use(errorHandler)
 

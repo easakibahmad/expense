@@ -7,6 +7,7 @@ import { AddExpenseModal } from './AddExpenseModal'
 
 const navItems = [
   { to: '/', label: 'Dashboard' },
+  { to: '/plan', label: 'Monthly plan' },
   { to: '/expenses', label: 'Expenses' },
 ]
 
@@ -57,9 +58,7 @@ function LayoutInner() {
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <AnimatedOutlet />
       </main>
-      {isAddModalOpen && (
-        <AddExpenseModal onClose={closeAddModal} onSuccess={closeAddModal} />
-      )}
+      {isAddModalOpen && <AddExpenseModal onClose={closeAddModal} onSuccess={closeAddModal} />}
     </div>
   )
 }

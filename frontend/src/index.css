@@ -15,7 +15,7 @@
 }
 
 /* Make native date input calendar icon visible on dark backgrounds */
-input[type="date"].date-input-dark::-webkit-calendar-picker-indicator {
+input[type='date'].date-input-dark::-webkit-calendar-picker-indicator {
   filter: invert(1);
   opacity: 0.8;
   cursor: pointer;

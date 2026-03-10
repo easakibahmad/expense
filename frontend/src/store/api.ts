@@ -23,6 +23,29 @@ export interface UpdateExpenseRequest {
   note?: string
 }
 
+// Monthly plan (per month: year_month YYYY-MM)
+export interface PlannedExpenseItem {
+  id: string
+  label: string
+  amount: number
+}
+
+export interface MonthlyPlanResponse {
+  items: PlannedExpenseItem[]
+  monthlyIncome: number | null
+}
+
+export interface PlanSummaryItem {
+  year_month: string
+  planned_total: number
+  monthly_income: number | null
+}
+
+export interface SavePlanRequest {
+  monthlyIncome?: number | null
+  items: { label: string; amount: number }[]
+}
+
 type CategoriesResponse = { categories: Category[] }
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/+$/, '') ?? 'http://localhost:3001'
@@ -32,7 +55,7 @@ export const expenseApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl,
   }),
-  tagTypes: ['Expenses', 'Categories', 'Trash'],
+  tagTypes: ['Expenses', 'Categories', 'Trash', 'Plan'],
   endpoints: (builder) => ({
     getExpenses: builder.query<Expense[], ExpensesQuery | void>({
       query: (args) => {
@@ -163,6 +186,36 @@ export const expenseApi = createApi({
         { type: 'Trash', id: 'LIST' },
       ],
     }),
+    // Monthly plan (per month)
+    getPlanMonths: builder.query<string[], void>({
+      query: () => ({ url: '/api/plan/months' }),
+      transformResponse: (response: { months?: string[] }) => response?.months ?? [],
+      providesTags: [{ type: 'Plan', id: 'MONTHS' }],
+    }),
+    getPlanSummaries: builder.query<{ summaries: PlanSummaryItem[] }, void>({
+      query: () => ({ url: '/api/plan/summaries' }),
+      providesTags: [{ type: 'Plan', id: 'SUMMARIES' }],
+    }),
+    getPlan: builder.query<MonthlyPlanResponse, string>({
+      query: (yearMonth) => ({ url: `/api/plan/${yearMonth}` }),
+      providesTags: (_res, _err, yearMonth) => [
+        { type: 'Plan', id: yearMonth },
+        { type: 'Plan', id: 'LIST' },
+      ],
+    }),
+    savePlan: builder.mutation<MonthlyPlanResponse, { yearMonth: string; body: SavePlanRequest }>({
+      query: ({ yearMonth, body }) => ({
+        url: `/api/plan/${yearMonth}`,
+        method: 'PUT',
+        body,
+      }),
+      invalidatesTags: (_res, _err, arg) => [
+        { type: 'Plan', id: arg.yearMonth },
+        { type: 'Plan', id: 'LIST' },
+        { type: 'Plan', id: 'MONTHS' },
+        { type: 'Plan', id: 'SUMMARIES' },
+      ],
+    }),
   }),
 })
 
@@ -179,4 +232,8 @@ export const {
   usePermanentDeleteExpenseMutation,
   useBulkPermanentDeleteExpensesMutation,
   useEmptyTrashMutation,
+  useGetPlanMonthsQuery,
+  useGetPlanSummariesQuery,
+  useGetPlanQuery,
+  useSavePlanMutation,
 } = expenseApi

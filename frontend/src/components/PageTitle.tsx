@@ -3,27 +3,30 @@ import { gsap } from 'gsap'
 
 interface PageTitleProps {
   title: string
-  subtitle?: string
+  subtitle?: React.ReactNode
 }
 
 export function PageTitle({ title, subtitle }: PageTitleProps) {
   const titleRef = useRef<HTMLHeadingElement>(null)
   const subRef = useRef<HTMLParagraphElement>(null)
+  const hasAnimatedRef = useRef(false)
 
   useEffect(() => {
-    if (titleRef.current) {
+    if (!titleRef.current) return
+    if (!hasAnimatedRef.current) {
+      hasAnimatedRef.current = true
       gsap.fromTo(
         titleRef.current,
         { opacity: 0, y: 16 },
         { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }
       )
-    }
-    if (subtitle && subRef.current) {
-      gsap.fromTo(
-        subRef.current,
-        { opacity: 0, y: 12 },
-        { opacity: 1, y: 0, duration: 0.5, delay: 0.1, ease: 'power2.out' }
-      )
+      if (subtitle && subRef.current) {
+        gsap.fromTo(
+          subRef.current,
+          { opacity: 0, y: 12 },
+          { opacity: 1, y: 0, duration: 0.5, delay: 0.1, ease: 'power2.out' }
+        )
+      }
     }
   }, [title, subtitle])
 

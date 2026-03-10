@@ -4,6 +4,7 @@ import { CATEGORIES, type Category } from '../data/types'
 import { CURRENCY_SYMBOL } from '../lib/currency'
 import { Card } from './Card'
 import { Button } from './Button'
+import { Spinner } from './Spinner'
 import { useCreateExpenseMutation } from '../store/api'
 
 function todayStr(): string {
@@ -58,10 +59,7 @@ export function AddExpenseModal({ onClose, onSuccess }: AddExpenseModalProps) {
       aria-labelledby="add-expense-title"
       style={{ minHeight: '100dvh' }}
     >
-      <Card
-        className="p-6 max-w-lg w-full shadow-xl"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <Card className="p-6 max-w-lg w-full shadow-xl" onClick={(e) => e.stopPropagation()}>
         <h2 id="add-expense-title" className="text-lg font-semibold text-zinc-100 mb-4">
           Add expense
         </h2>
@@ -109,7 +107,9 @@ export function AddExpenseModal({ onClose, onSuccess }: AddExpenseModalProps) {
               className="w-full px-4 py-2.5 rounded-xl bg-zinc-800/80 border border-zinc-700 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
             >
               {CATEGORIES.map((c) => (
-                <option key={c} value={c}>{c}</option>
+                <option key={c} value={c}>
+                  {c}
+                </option>
               ))}
             </select>
           </div>
@@ -127,8 +127,15 @@ export function AddExpenseModal({ onClose, onSuccess }: AddExpenseModalProps) {
             />
           </div>
           <div className="flex gap-3 pt-2">
-            <Button type="submit" size="lg" className="flex-1" disabled={isLoading}>
-              {isLoading ? 'Saving...' : 'Add expense'}
+            <Button type="submit" size="lg" className="flex-1 gap-2" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Spinner size="sm" className="shrink-0" />
+                  Saving
+                </>
+              ) : (
+                'Add expense'
+              )}
             </Button>
             <Button type="button" variant="ghost" size="lg" onClick={onClose}>
               Cancel

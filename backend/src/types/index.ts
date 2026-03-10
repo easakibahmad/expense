@@ -53,3 +53,52 @@ export function rowToExpense(row: ExpenseRow): Expense {
     note: row.note ?? undefined,
   }
 }
+
+// Monthly plan (single editable template)
+export interface PlannedExpenseItem {
+  id: string
+  label: string
+  amount: number
+}
+
+export interface MonthlyPlanResponse {
+  items: PlannedExpenseItem[]
+  monthlyIncome: number | null
+}
+
+export interface PlanSummaryItem {
+  year_month: string
+  planned_total: number
+  monthly_income: number | null
+}
+
+export interface SavePlanBody {
+  monthlyIncome?: number | null
+  items: { label: string; amount: number }[]
+}
+
+export interface PlanItemRow {
+  id: string
+  label: string
+  amount: string
+  position: number
+  plan_id?: string
+}
+
+export interface CreatePlanItemBody {
+  label: string
+  amount: number
+}
+
+export interface UpdatePlanItemBody {
+  label?: string
+  amount?: number
+}
+
+export function rowToPlanItem(row: PlanItemRow): PlannedExpenseItem {
+  return {
+    id: row.id,
+    label: row.label,
+    amount: parseFloat(row.amount),
+  }
+}

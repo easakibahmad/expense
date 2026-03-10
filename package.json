@@ -1,0 +1,7 @@
+{
+  "name": "expense-monorepo",
+  "private": true,
+  "scripts": {
+    "format": "npx prettier@3 --write \"backend/src/**/*.ts\" \"frontend/src/**/*.{ts,tsx,js,jsx,css,json}\""
+  }
+}

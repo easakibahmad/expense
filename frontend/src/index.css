@@ -27,3 +27,21 @@ input[type="date"].date-input-dark::-webkit-calendar-picker-indicator {
     padding-top: env(safe-area-inset-top);
   }
 }
+
+/* Remove focus/click border on Recharts pie and bar segments (Chrome shows outline/box-shadow on click) */
+.recharts-wrapper *:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  stroke: none !important;
+}
+.recharts-wrapper *:focus path,
+.recharts-wrapper *:focus rect,
+.recharts-wrapper g:focus path,
+.recharts-wrapper path:focus {
+  stroke: none !important;
+}
+.recharts-pie *,
+.recharts-layer {
+  outline: none !important;
+}

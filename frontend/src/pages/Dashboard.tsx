@@ -21,10 +21,10 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  Cell,
   PieChart,
   Pie,
   Legend,
+  Sector,
 } from 'recharts'
 
 const PERIODS: { value: Period; label: string }[] = [
@@ -84,23 +84,37 @@ export function Dashboard() {
   const categoryData = useMemo(() => byCategory(filtered), [filtered])
 
   const barData = useMemo(() => {
-    if (period === 'week' || period === 'month') {
-      return byDay(filtered).map((d) => ({
-        label: new Date(d.date + 'T12:00:00').toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric',
-        }),
-        total: d.total,
-      }))
-    }
-    return byMonth(filtered).map((d) => ({
-      label: new Date(d.month + '-01').toLocaleDateString('en-US', {
-        month: 'short',
-        year: '2-digit',
-      }),
-      total: d.total,
+    const raw =
+      period === 'week' || period === 'month'
+        ? byDay(filtered).map((d) => ({
+            label: new Date(d.date + 'T12:00:00').toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+            }),
+            total: d.total,
+          }))
+        : byMonth(filtered).map((d) => ({
+            label: new Date(d.month + '-01').toLocaleDateString('en-US', {
+              month: 'short',
+              year: '2-digit',
+            }),
+            total: d.total,
+          }))
+    return raw.map((d, i) => ({
+      ...d,
+      fill: CHART_COLORS[i % CHART_COLORS.length],
     }))
   }, [filtered, period])
+
+  const categoryDataWithColors = useMemo(
+    () =>
+      categoryData.map((d, i) => ({
+        ...d,
+        fill: PIE_COLORS[i % PIE_COLORS.length],
+        stroke: 'none',
+      })),
+    [categoryData]
+  )
 
   const cardsRef = useRef<HTMLDivElement>(null)
   const chartRef = useRef<HTMLDivElement>(null)
@@ -240,14 +254,11 @@ export function Dashboard() {
                   content={<BarChartTooltip />}
                   cursor={{ fill: 'rgba(245, 158, 11, 0.08)' }}
                 />
-                <Bar dataKey="total" radius={[6, 6, 0, 0]}>
-                  {barData.map((_, i) => (
-                    <Cell
-                      key={i}
-                      fill={CHART_COLORS[i % CHART_COLORS.length]}
-                    />
-                  ))}
-                </Bar>
+                <Bar
+                  dataKey="total"
+                  radius={[6, 6, 0, 0]}
+                  activeBar={{ stroke: 'none' }}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -261,7 +272,7 @@ export function Dashboard() {
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  data={categoryData}
+                  data={categoryDataWithColors}
                   dataKey="total"
                   nameKey="category"
                   cx="50%"
@@ -273,15 +284,9 @@ export function Dashboard() {
                     `${name} ${((percent ?? 0) * 100).toFixed(1)}%`
                   }
                   labelLine={false}
-                >
-                  {categoryData.map((_, i) => (
-                    <Cell
-                      key={i}
-                      fill={PIE_COLORS[i % PIE_COLORS.length]}
-                      stroke="transparent"
-                    />
-                  ))}
-                </Pie>
+                  activeShape={(props) => <Sector {...props} stroke="none" />}
+                  rootTabIndex={-1}
+                />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: '#27272a',
